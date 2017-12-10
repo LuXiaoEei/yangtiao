@@ -45,23 +45,23 @@ pp+geom_point(data = data.frame(x,y),aes(x,y),size=0.5)
 # plot(xx,newx)
 
 # 二维曲线——sin(t) ------------------------------------------------------------
-m=0
-N=15
-u <- seq(-2,3*pi,length.out = N)
-t <- seq(0,2*pi,0.01)
-n=3
-X <- sapply(0:(length(u)-2-n-m),BaSplite,x=t,n,u)
-y=sin(t)
-betay <- solve(t(X)%*%X)%*%t(X)%*%y
-betax <- solve(t(X)%*%X)%*%t(X)%*%t
+  m=0
+  N=15
+  u <- seq(-2,3*pi,length.out = N)
+  t <- seq(0,2*pi,0.01)
+  n=3
+  X <- sapply(0:(length(u)-2-n-m),BaSplite,x=t,n,u)
+  y=sin(t)
+  betay <- solve(t(X)%*%X)%*%t(X)%*%y
+  betax <- solve(t(X)%*%X)%*%t(X)%*%t
 
-new <- X%*%betay
+  new <- X%*%betay
 
-ggplot(data = data.frame(x=t,y=new),aes(x,y))+geom_line()+
-  geom_path(data=data.frame(t,y),aes(t,y),color='red')+
-  geom_point(data=data.frame(betax,betay),aes(betax,betay))+
-  geom_path(data=data.frame(betax,betay),aes(betax,betay))+
-  geom_text(data=data.frame(x=betax,y=betay),aes(x,y),label=c(0:(length(u)-2-n)),colour="blue",size=5)
+  ggplot(data = data.frame(x=t,y=new),aes(x,y))+geom_line()+
+    geom_path(data=data.frame(t,y),aes(t,y),color='red')+
+    geom_point(data=data.frame(betax,betay),aes(betax,betay))+
+    geom_path(data=data.frame(betax,betay),aes(betax,betay))+
+    geom_text(data=data.frame(x=betax,y=betay),aes(x,y),label=c(0:(length(u)-2-n)),colour="blue",size=5)
 
 
 # plot(t,new,col='red',cex=0.05)
