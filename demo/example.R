@@ -64,10 +64,10 @@ ggplot(data = data.frame(x=t,y=new),aes(x,y))+geom_line()+
   geom_text(data=data.frame(x=betax,y=betay),aes(x,y),label=c(0:(length(u)-2-n)),colour="blue",size=5)
 
 
-plot(t,new,col='red',cex=0.05)
-points(t,y,cex=0.05)
-points(betax,betay)
-sum((new-y)^2)
+# plot(t,new,col='red',cex=0.05)
+# points(t,y,cex=0.05)
+# points(betax,betay)
+# sum((new-y)^2)
 
 
 # 三维曲面 --------------------------------------------------------------------
