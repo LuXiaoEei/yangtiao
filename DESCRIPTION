@@ -1,0 +1,10 @@
+Package: yangtiao
+Type: Package
+Title: 
+Version: 0.1.0
+Author: LuXiaoEei
+Maintainer: LuXiaoEei <160902073@stu.njnu.edu.cn>
+Description: the package can be used to calculate the B_Spline value
+License: 
+Encoding: UTF-8
+LazyData: true
