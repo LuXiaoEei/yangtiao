@@ -6,7 +6,7 @@ require(rgl)
 
 # 二维曲线——圆 -----------------------------------------------------------------
 n=3
-N=15
+N=7
 t <- seq(0,2*pi,0.01)
 x <- cos(t)
 y <- sin(t)
@@ -15,9 +15,11 @@ y <- sin(t)
 # i=15
 # sign(t>=u[i+1]&t<u[i+2])
 
-u <- seq(-10,3*pi,length.out = N)
+# u <- seq(-10,3*pi,length.out = N)
+u <- c(0,0,0,seq(0,2*pi,length.out = N),2*pi,2*pi,2*pi)
 # u <- seq(-80,850,length.out = N)
 X <- sapply(0:(length(u)-2-n),BaSplite,x=t,n=n,u=u)
+
 mu <- tryCatch({
   solve(t(X)%*%X)%*%t(X)},
   error=function(e){
