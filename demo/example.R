@@ -5,7 +5,7 @@ require(yangtiao)
 require(rgl)
 
 # 二维曲线——圆 -----------------------------------------------------------------
-n=3
+degree=3
 N=7
 t <- seq(0,2*pi,0.01)
 x <- cos(t)
@@ -16,9 +16,9 @@ y <- sin(t)
 # sign(t>=u[i+1]&t<u[i+2])
 
 # u <- seq(-10,3*pi,length.out = N)
-u <- c(0,0,0,seq(0,2*pi,length.out = N),2*pi,2*pi,2*pi)
+u <- c(seq(0,2*pi,length.out = N))
 # u <- seq(-80,850,length.out = N)
-X <- sapply(0:(length(u)-2-n),BaSplite,x=t,n=n,u=u)
+X <- sapply(0:(length(u)+degree-2),BaSplite,x=t,degree=degree,u=u,n=length(u))
 
 mu <- tryCatch({
   solve(t(X)%*%X)%*%t(X)},
@@ -30,7 +30,7 @@ mu <- tryCatch({
 betax <- mu%*%x
 betay <- mu%*%y
 xx <- runif(1000,0,2*pi) #产生新的点
-new <- sapply(0:(length(u)-2-n),BaSplite,x=xx,n=n,u=u)
+new <- sapply(0:(length(u)+degree-2),BaSplite,x=xx,degree=degree,u=u,n=length(u))
 # new <- sapply(0:(length(u)-2-n),BaSplite,x=t,n=n,u=u)
 newx <- new%*%betax #产生新的点
 newy <- new%*%betay #产生新的点
@@ -38,7 +38,7 @@ p <- ggplot(data.frame(newx,newy),aes(newx,newy))+
   geom_point(size=0.5,color='red')
 p
 pp <- p+geom_path(data=data.frame(x=betax,y=betay),aes(x,y))+ # 控制点
-  geom_text(data=data.frame(x=betax,y=betay),aes(x,y),label=c(0:(length(u)-2-n)),colour="blue",size=8)
+  geom_text(data=data.frame(x=betax,y=betay),aes(x,y),label=c(0:(length(u)+degree-2)),colour="blue",size=8)
 pp
 pp+geom_point(data = data.frame(x,y),aes(x,y),size=0.5)
 
@@ -48,11 +48,11 @@ pp+geom_point(data = data.frame(x,y),aes(x,y),size=0.5)
 
 # 二维曲线——sin(t) ------------------------------------------------------------
   m=0
-  N=15
-  u <- seq(-2,3*pi,length.out = N)
+  N=8
+  u <- seq(0,2*pi,length.out = N)
   t <- seq(0,2*pi,0.01)
-  n=3
-  X <- sapply(0:(length(u)-2-n-m),BaSplite,x=t,n,u)
+  degree=3
+  X <- sapply(0:(length(u)+degree-2-m),BaSplite,x=t,degree,u,length(u))
   y=sin(t)
   betay <- solve(t(X)%*%X)%*%t(X)%*%y
   betax <- solve(t(X)%*%X)%*%t(X)%*%t
@@ -63,7 +63,7 @@ pp+geom_point(data = data.frame(x,y),aes(x,y),size=0.5)
     geom_path(data=data.frame(t,y),aes(t,y),color='red')+
     geom_point(data=data.frame(betax,betay),aes(betax,betay))+
     geom_path(data=data.frame(betax,betay),aes(betax,betay))+
-    geom_text(data=data.frame(x=betax,y=betay),aes(x,y),label=c(0:(length(u)-2-n)),colour="blue",size=5)
+    geom_text(data=data.frame(x=betax,y=betay),aes(x,y),label=c(0:(length(u)+degree-2-m)),colour="blue",size=5)
 
 
 # plot(t,new,col='red',cex=0.05)
@@ -76,8 +76,8 @@ pp+geom_point(data = data.frame(x,y),aes(x,y),size=0.5)
 
 # 生成对应的样条基函数
 BaValue <- function(ux,uy,nx,ny,x,y){
-  Bx <- sapply(0:(length(ux)-2-nx),BaSplite,x=x,n=nx,u=ux)
-  By <- sapply(0:(length(uy)-2-ny),BaSplite,x=y,n=ny,u=uy)
+  Bx <- sapply(0:(length(ux)+nx-2),BaSplite,x=x,degree=nx,u=ux,n=length(ux))
+  By <- sapply(0:(length(uy)+ny-2),BaSplite,x=y,degree=ny,u=uy,n=length(uy))
 
   for (index in 1:ncol(Bx)){
     if (index==1){
@@ -98,6 +98,7 @@ nx=3
 ny=3
 ux=seq(-2,8,length.out = Nx)
 uy=seq(30,130,length.out = Ny)
+
 
 X <- BaValue(ux,uy,nx,ny,dat$x,dat$y)
 
@@ -131,8 +132,8 @@ plot_ly(data=data.frame(newx,newy,newz),x=~newx,y=~newy,z=~newz,sizes=c(3,6))%>%
 
 # 生成对应的样条基函数
 BaValue <- function(ux,uy,nx,ny,x,y){
-  Bx <- sapply(0:(length(ux)-2-nx),BaSplite,x=x,n=nx,u=ux)
-  By <- sapply(0:(length(uy)-2-ny),BaSplite,x=y,n=ny,u=uy)
+  Bx <- sapply(0:(length(ux)+nx-2),BaSplite,x=x,degree=nx,u=ux,n=length(ux))
+  By <- sapply(0:(length(ux)+ny-2),BaSplite,x=y,degree=ny,u=uy,n=length(uy))
 
   for (index in 1:ncol(Bx)){
     if (index==1){
