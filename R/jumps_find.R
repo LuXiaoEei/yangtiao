@@ -1,4 +1,4 @@
-jumps_find<-function(u0,u1,degree,yj,uj,err,sigma2hat,alpha){
+jumps_find <-function(u0,u1,degree,yj,uj,err,sigma2hat,alpha,gamma=0.05){
   jumps2 <- c()
   n <- length(yj)
   k0 <- length(u0)
@@ -43,64 +43,53 @@ jumps_find<-function(u0,u1,degree,yj,uj,err,sigma2hat,alpha){
   # lambdaM_1[Nt]<- lambda_1
   q2_1<- qchisq(1-alpha,degree+1,lambda_1)*sigma2hat
 
-  lambda_2<- max(mean(DRSSuT)/sigma2hat-degree-1,0)
+  # lambda_2<- max(mean(DRSSuT)/sigma2hat-degree-1,0)
   # lambdaM_2[Nt]<- lambda_2
-  q2_2<- qchisq(1-alpha,degree+1,lambda_2)*sigma2hat
+  # q2_2<- qchisq(1-alpha,degree+1,lambda_2)*sigma2hat
 
   #plot(u1,DRSStotal,main = paste('Simulation',Nt))
   #abline(h=q2,col='red')
   ### 找跳点
   id_1<- which(DRSStotal>q2_1)
-  id_2<- which(DRSStotal>q2_2)
+  # id_2<- which(DRSStotal>q2_2)
   #cat('id_1',id_1,'\n')
   #cat('id_2',id_2,'\n')
   idtemp_1<-id_1
-  idtemp_2<-id_2
+  # idtemp_2<-id_2
   DRSStotal_temp<-DRSStotal
 
-  while (length(idtemp_2)>0){
-    #从id_1中把包含在nx的（2p+1）hn的邻域去掉
-    nx<- which(DRSStotal_temp==max(DRSStotal_temp,na.rm = TRUE))
-    u.jump<- mean(u1[nx])
-    jumps2<- c(jumps2,u.jump)
-    #将跳点插入
-    if(length(u.jump)>0){
-      du<- abs(u0-u.jump)
-      m<- which(du==min(du))
-      m<- m[1]
-      if(du[m]<err/2){
-        u0<- c(u0[-m],rep(u.jump,degree+1))
-        u0<- sort(u0)
-      }else{
-        u0<- c(u0,rep(u.jump,degree+1))
-        u0<- sort(u0)
-      }
-      }
-    idinterval<-  c(max(1,ceiling((mean(nx)))-ceiling(nu1*2*(degree+0.5)/(k0+1))):min(ceiling((mean(nx)))+ceiling(nu1*2*(degree+0.5)/(k0+1)),length(u1)))
-    #cat('idinterval',idinterval,'\n')
-    if (length(idtemp_1)>0){
-      id1_1<-idtemp_1
-      for (j in 1:length(id1_1)){
-        for (i in 1:length(idinterval)){
-          if (id1_1[j]==idinterval[i]){
-            idtemp_1<-idtemp_1[-(which(idtemp_1==id1_1[j]))]
-          }
+  # while (length(idtemp_2)>0){
+  # cat(length(idtemp_1),'\n')
+  if (length(idtemp_1)>=gamma*nu1){
+      while (length(idtemp_1)>0){
+      #从id_1中把包含在nx的（2p+1）hn的邻域去掉
+      nx<- which(DRSStotal_temp==max(DRSStotal_temp,na.rm = TRUE))
+      u.jump<- mean(u1[nx])
+      jumps2<- c(jumps2,u.jump)
+      #将跳点插入
+      if(length(u.jump)>0){
+        du<- abs(u0-u.jump)
+        m<- which(du==min(du))
+        m<- m[1]
+        if(du[m]<err/2){
+          u0<- c(u0[-m],rep(u.jump,degree+1))
+          u0<- sort(u0)
+        }else{
+          u0<- c(u0,rep(u.jump,degree+1))
+          u0<- sort(u0)
         }
-      }
-      }
-    id1_2<-idtemp_2
-    for (j in 1:length(id1_2)){
-      for (i in 1:length(idinterval)){
-        if (id1_2[j]==idinterval[i]){
-          idtemp_2<-idtemp_2[-(which(idtemp_2==id1_2[j]))]
         }
-      }
-      }
-    # cat('idtemp_1',idtemp_1,'\n')
-    # cat('idtemp_2',idtemp_2,'\n')
-    DRSStotal_temp[max(1,ceiling((mean(nx)))-ceiling(nu1*2*(degree+0.5)/(k0+1))):min(ceiling((mean(nx)))+ceiling(nu1*2*(degree+0.5)/(k0+1)),length(u1))]<-0
-    # cat('DRSStotal_temp',DRSStotal_temp,'\n')
+      idinterval<-  c(max(1,ceiling((mean(nx)))-ceiling(nu1*2*(degree+0.5)/(k0+1))):min(ceiling((mean(nx)))+ceiling(nu1*2*(degree+0.5)/(k0+1)),length(u1)))
+      #cat('idinterval',idinterval,'\n')
+      idtemp_1 <- setdiff(idtemp_1,idinterval)
+      # idtemp_2 <- setdiff(idtemp_2,idinterval)
+
+      # cat('idtemp_1',idtemp_1,'\n')
+      # cat('idtemp_2',idtemp_2,'\n')
+      DRSStotal_temp[max(1,ceiling((mean(nx)))-ceiling(nu1*2*(degree+0.5)/(k0+1))):min(ceiling((mean(nx)))+ceiling(nu1*2*(degree+0.5)/(k0+1)),length(u1))]<-0
+      # cat('DRSStotal_temp',DRSStotal_temp,'\n')
     }
+  }
   # cat('jumps2',jumps2,'\n')
   jumps_find_list<-list(u0,jumps2)
   return(jumps_find_list)
