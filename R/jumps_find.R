@@ -63,7 +63,7 @@ jumps_find <-function(u0,u1,degree,yj,uj,err,sigma2hat,alpha,gamma=0.05){
   if (length(idtemp_1)>=gamma*nu1){
       while (length(idtemp_1)>0){
       #从id_1中把包含在nx的（2p+1）hn的邻域去掉
-      nx<- which(DRSStotal_temp==max(DRSStotal_temp,na.rm = TRUE))
+      nx <- which(DRSStotal_temp==max(DRSStotal_temp,na.rm = TRUE))
       u.jump<- mean(u1[nx])
       jumps2<- c(jumps2,u.jump)
       #将跳点插入
