@@ -38,6 +38,10 @@ system.time(
 
 
     res <- ChoBic(lower = lowerKnot,upper = upperKnot,Post = Post,Y = Ynoise,AllPost=AllPost,AllY=AllY)
+
+
+
+    # res <- ChoBic1(lower = lowerKnot,upper = upperKnot,Post = Post,Y = Ynoise,AllPost=AllPost,AllY=AllY)
     print(res)
 
     # 节点

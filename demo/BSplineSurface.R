@@ -6,7 +6,6 @@ require(yangtiao)
 rm(list=ls())
 gc()
 
-set.seed(1234)
 
 if (dir.exists('.//tmp')) unlink('.//tmp', recursive=TRUE)
 dir.create('.//tmp')
@@ -23,7 +22,7 @@ f2 <- function(x,y){
 ROW <- 256
 COL <- 256
 
-sigma <- 0.2 #噪声大小
+sigma <- 0.5 #噪声大小
 
 Image_raw <- matrix(f2(x=rep(c(1:ROW),COL)/ROW,y=rep(c(1:COL),each=ROW)/COL),nrow = ROW,ncol = COL)
 # Image_raw <- Image_raw/max(Image_raw)
@@ -36,7 +35,7 @@ display(Image_noise,method = 'raster')
 message('######## ','Detect Jumps',' ########','\n')
 startime <- Sys.time()
 
-K <- c(0)
+K <- c(0,1)
 Count <- 1
 source('.//demo//searchjump.R')
 print(Sys.time()-startime)

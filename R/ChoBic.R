@@ -3,6 +3,7 @@ ChoBic <- function(lower,upper,Post,Y,AllPost,AllY){
   if(missing(AllPost)) AllPost <- Post
   if(missing(AllY)) AllY <- Y
 
+  # 次数
   updegree <- 3
   lowdegree <- 1
   lendegree <- length(lowdegree:updegree)
@@ -19,7 +20,7 @@ ChoBic <- function(lower,upper,Post,Y,AllPost,AllY){
     AllX <- AllBx[,rep(1:ncol(AllBx),ncol(AllBy))]*AllBy[,rep(1:ncol(AllBy),each=ncol(AllBx))]
 
     residual <- AllY-AllX %*%(MASS::ginv(t(X)%*%X)%*%t(X)%*%Y)
-    return(log(mean(residual^2))+ncol(X)*log(nrow(X))/nrow(X))
+    return(log(mean(residual^2))+ncol(AllX)*log(nrow(AllX))/nrow(AllX))
   }
 
   Xlist <- list()

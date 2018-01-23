@@ -99,7 +99,6 @@ ny=3
 ux=seq(-2,8,length.out = Nx)
 uy=seq(30,130,length.out = Ny)
 
-
 X <- BaValue(ux,uy,nx,ny,dat$x,dat$y)
 
 mu <- tryCatch({

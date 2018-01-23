@@ -1,6 +1,6 @@
-# 在不跨越跳点的时候寻找同一区域的点并标记的树递归算法
-# h：搜索窗宽;H:最大窗宽，post；搜索中心，Jumps：跳0-1矩阵（1表示跳点）
-# ii和maxi表示计数，防止递归太深；ROW，COL：图像边界;searched:记录搜索过的点
+# 在不跨越跳点的时候寻找同一区域的点并标记的非递归算法，标记并返回新标记的点的坐标
+# h：搜索窗宽;post；搜索中心，Jumps：跳0-1矩阵（1表示跳点）
+# ROW，COL：图像边界;searched:记录搜索过的点的0-1矩阵
 SearPoints1 <- function(post,h,lambda=2){
     if(searched[post]==0){ #确认post点未搜索过
       Area <- GetArea(point = post,Row = ROW,Col = COL,h = h)

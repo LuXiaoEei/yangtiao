@@ -150,14 +150,12 @@ ClearPoint <- function(hmin=2,count=1){
   return(Jumpstmp)
 }
 Jumpstmp <- AllJumps
-Jumpstmp <- ClearPoint(hmin = 1,count = 1)
-Jumpstmp <- ClearPoint(hmin = 2,count = 2)
-Jumpstmp <- ClearPoint(hmin = 3,count = 3)
-Jumpstmp <- ClearPoint(hmin = 4,count = 4)
-Jumpstmp <- ClearPoint(hmin = 5,count = 5)
+
+for (ii in 1:(2*length(K)+1)){
+  Jumpstmp <- ClearPoint(hmin = ii,count = ii)
+}
 
 AllJumps_clear <- Jumpstmp
-
 
 # 插值
 Jumps_clear <- matrix(0,ROW,COL)
@@ -165,20 +163,25 @@ Jumps_clear[AllJumps_clear] <- 1
 Jumps <- Jumps_clear
 
 Jumps_edge <- Jumps_clear
-Jumps_edge[c(1,ROW),] <- 1
-Jumps_edge[,c(1,COL)] <- 1
+
+# for (i in 1:nrow(AllJumps_clear)){
+#   tmp <- GetArea(point = AllJumps_clear[i,],Row = ROW,Col = COL,h = round(min(ROW,COL)*0.01))
+#   tmp <- tmp[tmp[,1]==1|tmp[,1]==ROW|tmp[,2]==1|tmp[,2]==COL,,drop=FALSE]
+#   Jumps_edge[tmp] <- 1
+# }
+
 
 display(Jumps_clear,method = 'r')
-display(Jumps_edge,method = 'r')
 
-Judg <- function(index,h=1){
+Judg <- function(index,h=1,hmax){
+  if(h>hmax){return(Inf)}
   near <- GetArea(AllJumps_clear[index,],ROW,COL,h)
   points <- near[Jumps_edge[near]==1,,drop=FALSE]
-  if (nrow(points)==1) return(Judg(index,h=h+1))
+  if (nrow(points)==1) return(Judg(index,h=h+1,hmax=hmax))
   if (max(dist(points))>2*h){
     return(h)
   }else{
-    return(Judg(index,h=h+1))
+    return(Judg(index,h=h+1,hmax=hmax))
   }
 }
 
@@ -187,15 +190,16 @@ H <- matrix(rep(1,2*nrow(AllJumps_clear)),ncol = 2)
 if (!exists('Count')) Count <- 1
 
 for (index in 1:nrow(AllJumps_clear)){
-  H[index,] <- c(index,Judg(index,h=1))
+  H[index,] <- c(index,Judg(index,h=1,hmax=0.1*min(COL,ROW)))
 }
 H <- H[order(H[,2],decreasing = TRUE),]
-H <- H[H[,2]>Count,,drop=FALSE]
+Hinf <- H[is.infinite(H[,2]),,drop=FALSE]
+H <- H[H[,2]>Count&!is.infinite(H[,2]),,drop=FALSE]
 
 if (nrow(H)>0){
   for (iii in 1:nrow(H)){
   index <- H[iii,1]
-  h <- Judg(index,h=1)
+  h <- Judg(index,h=1,hmax=0.1*min(COL,ROW))
   if (h>Count){
     near <- GetArea(AllJumps_clear[index,],ROW,COL,h)
     points <- near[Jumps_edge[near]==1,,drop=FALSE]
@@ -213,6 +217,32 @@ if (nrow(H)>0){
       Jumps[round(res)] <- 1
     }
   }
+  }
+}
+
+Jumps_edge[c(1,ROW),] <- 1
+Jumps_edge[,c(1,COL)] <- 1
+if(nrow(Hinf)>0){
+  for (iii in 1:nrow(Hinf)){
+    index <- Hinf[iii,1]
+    h <- Judg(index,h=1,hmax = Inf)
+    if (h>Count){
+      near <- GetArea(AllJumps_clear[index,],ROW,COL,h)
+      points <- near[Jumps_edge[near]==1,,drop=FALSE]
+      Dist <- as.matrix(dist(points))
+      vertex <- points[which(Dist==max(Dist),arr.ind = TRUE)[,1],,drop=FALSE]
+      x2 <- AllJumps_clear[index,]
+      for (ii in 1:nrow(vertex)){
+        x1 <- vertex[ii,]
+        if(abs(x1[1]-x2[1])>=abs(x1[2]-x2[2])){
+          res <- do.call(cbind,approx(x=c(x1[1],x2[1]),y=c(x1[2],x2[2]),xout = x1[1]:x2[1]))
+        }else{
+          res <- do.call(cbind,approx(x=c(x1[2],x2[2]),y=c(x1[1],x2[1]),xout = x1[2]:x2[2]))[,2:1]
+        }
+        Jumps_edge[round(res)] <- 1
+        Jumps[round(res)] <- 1
+      }
+    }
   }
 }
 
