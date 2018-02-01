@@ -17,6 +17,24 @@ f2 <- function(x,y){
   return(z)
 }
 
+# f2 <- function(x,y){
+#   z <- 1/3*sign(y>0.3*sin(x*pi)+0.4)+1/4*sign(x>0.2*sin(y*pi)+0.5)+(1-x)*y*5/12
+#   return(z)
+# }
+#
+# f2 <- function(x,y){
+#   z <- 1/2*sign(y>0.6*sin(pi*x)+0.2)+1/2*sign(x>0.6*sin(pi*y)+0.2)
+#   return(z)
+# }
+f2 <- function(x,y){
+  z <- -2*(x-0.5)^2-2*(y-0.5)^2+sign((x-0.5)^2+(y-0.5)^2<0.25^2)
+  return(z)
+}
+
+f2 <- function(x,y){
+  z <-cos(4*pi*(1-x-y))-2*cos(4*pi*(1-x-y))*sign(x+y-1>0)
+  return(z)
+}
 
 # 定义图像尺寸
 ROW <- 256
@@ -35,8 +53,16 @@ display(Image_noise,method = 'raster')
 message('######## ','Detect Jumps',' ########','\n')
 startime <- Sys.time()
 
-K <- c(0,1)
+if(exists('blur')) rm(blur)
+# 寻找跳点中节点和次数的上限设置
+up <- 20
+updegree <- 5
+
+Smooth <- 2
+K <- c(0)
+if(length(K)>2) blur <- c(1/3,1/3,1/3)
 Count <- 1
+gamma <- 0.15
 source('.//demo//searchjump.R')
 print(Sys.time()-startime)
 
@@ -48,7 +74,6 @@ message('######## ','Block Image',' ########','\n')
 startime <- Sys.time()
 
 hmax <- 5
-lambda <- 3
 source('.//demo//block.R')
 print(Sys.time()-startime)
 
@@ -60,9 +85,6 @@ message('######## ','Fit Image',' ########','\n')
 startime <- Sys.time()
 
 denoise <- FALSE
-lowerKnot <- 2
-upperKnot <- 8
+
 source('.//demo//fit.R')
 print(Sys.time()-startime)
-
-

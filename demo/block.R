@@ -44,7 +44,7 @@ def1 <- function(Jumps,hmax=5,theta=0.95,lambda=3){
 # def2(Jumps = Jumps_clear,hmax = 5)
 
 if (!exists('hmax')){hmax <- 5}
-if (!exists('lambda')){lambda <- 3}
+if (!exists('lambda')){lambda <- 1000000}
 
 def1(Jumps = Jumps,hmax = hmax,theta = 0.95,lambda = lambda) #初始化参数
 
@@ -67,13 +67,13 @@ system.time(
     newpoints <- ROW*COL
     chaPro <- 0
     while (newpoints!=0){
-      Areatmp <- matrix(NA,0,2)
+      Areatmp <- matrix(NA,0,2)[-1,]
       for (index in 1:nrow(Area)){
         post <- Area[index,,drop=FALSE]
         Areatmp <- rbind(Areatmp,SearPoints1(post,h = hmax,lambda = lambda))
       }
       Area2 <- Area
-      Area <- Areatmp
+      Area <- Areatmp[!is.na(Areatmp[,1]),,drop=FALSE]
       oldpoints <- newpoints
       newpoints <- nrow(Area)
       chaPro <- newpoints/oldpoints
@@ -94,7 +94,7 @@ display(mark/max(mark),method = 'raster')
 display(searched,method = 'raster')
 display(Jumps,method = 'raster')
 
-save(mark,searched,tag,file = './/tmp//mark.Rdata')
+save(mark,searched,tag,lowdegree,updegree,lowerKnot,upperKnot,file = './/tmp//mark.Rdata')
 
 # 分块去噪 --------------------------------------------------------------------
 cat('######### block denoise ##########','\n')
@@ -134,4 +134,4 @@ res <- apply(abs(JumpValue[,-1,drop=FALSE]-JumpValue[,1]),1,which.min) #通过�
 
 mark[AllJumps] <- res
 display(mark/max(mark),method = 'raster')
-save(AllJumps,mark,Image_noise,Image_raw,sigma,ModeNum,AllJumps_clear,file = './/tmp//block.Rdata')
+save(AllJumps,mark,Image_noise,Image_raw,sigma,ModeNum,AllJumps_clear,lowdegree,updegree,lowerKnot,upperKnot,file = './/tmp//block.Rdata')

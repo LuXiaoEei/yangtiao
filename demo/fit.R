@@ -7,13 +7,10 @@ require(yangtiao)
 # load('.//tmp//block.Rdata')
 # display(mark/max(mark))
 
-if (!exists('lowerKnot')) lowerKnot <- 2
-if (!exists('upperKnot')) upperKnot <- 8
-
 ROW <- nrow(Image_noise)
 COL <- ncol(Image_noise)
 
-IgnPoints <- apply(AllJumps,1,GetArea,Row = ROW,Col = COL,h = 1)
+IgnPoints <- lapply(1:nrow(AllJumps),function(x) GetArea(point = AllJumps[x,],Row = ROW,Col = COL,h = 1))
 IgnPoints <- unique.matrix(do.call(rbind,IgnPoints)) #这些点由于噪声或者跳的原因不用于拟合
 mark_noise <- mark
 mark_noise[IgnPoints] <- 0
@@ -35,13 +32,8 @@ system.time(
       Post <- which(mark_noise==Mode,arr.ind = TRUE)
       Ynoise <- Image_noise[Post]
     }
-
-
-    res <- ChoBic(lower = lowerKnot,upper = upperKnot,Post = Post,Y = Ynoise,AllPost=AllPost,AllY=AllY)
-
-
-
-    # res <- ChoBic1(lower = lowerKnot,upper = upperKnot,Post = Post,Y = Ynoise,AllPost=AllPost,AllY=AllY)
+    res <- ChoBic1(lowerKnot = lowerKnot,upperKnot = upperKnot,Post = Post,Y = Ynoise,AllPost=AllPost,AllY=AllY,updegree = updegree,lowdegree = lowdegree)
+    # res <- ChoBic(lower = lowerKnot,upper = upperKnot,Post = Post,Y = Ynoise,AllPost=AllPost,AllY=AllY)
     print(res)
 
     # 节点
@@ -51,6 +43,9 @@ system.time(
     # 次数
     DegreeX <- res$DegreeX
     DegreeY <- res$DegreeY
+
+    # DegreeX <- 5
+    # DegreeY <- 5
 
     KnotX <- seq(range(Post[,1])[1]-1,range(Post[,1])[2]+1,length.out = KnotNumX)
     KnotY <- seq(range(Post[,2])[1]-1,range(Post[,2])[2]+1,length.out = KnotNumY)
@@ -71,7 +66,7 @@ if(exists('Image_raw')){
   MISE <- mean(Diff^2)
   print(MISE)
 
-  AllNear <- apply(AllJumps_clear,1,GetArea,Row = ROW,Col = COL,h = round(min(ROW,COL)*0.04))
+  AllNear <- lapply(1:nrow(AllJumps_clear),function(x) GetArea(point = AllJumps_clear[x,],Row = ROW,Col = COL,h = round(min(ROW,COL)*0.04)))
   AllNear <- unique.matrix(do.call(rbind,AllNear))
 
   MISEe <- mean((Image_fit[AllNear]-Image_raw[AllNear])^2)
@@ -88,8 +83,7 @@ if(exists('Image_raw')){
 display(Image_fit,method = 'raster')
 save.image(paste0('.//tmp//',MISE*10^4,'.Rdata'))
 # save.image(paste0('.//res//',MISE*10^4,'.Rdata'))
-
-
+mean((Image_fit[AllPost]-Image_raw[AllPost])^2)
 
 
 

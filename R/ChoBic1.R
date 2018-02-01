@@ -1,27 +1,27 @@
-ChoBic1 <- function(lower,upper,Post,Y,AllPost,AllY){
+ChoBic1 <- function(lowerKnot,upperKnot,Post,Y,AllPost,AllY,updegree=3,lowdegree=1){
 
   if(missing(AllPost)) AllPost <- Post
   if(missing(AllY)) AllY <- Y
 
-  updegree <- 3
-  lowdegree <- 1
+  # updegree <- 3
+  # lowdegree <- 1
   lenDeg <- length(lowdegree:updegree)
-  lenKnot <- length(lower:upper)
+  lenKnot <- length(lowerKnot:upperKnot)
 
   Xlist <- list()
   AllXlist <- list()
-  for (KnotNumX in lower:upper){
+  for (KnotNumX in lowerKnot:upperKnot){
     KnotX <- seq(range(Post[,1])[1]-1,range(Post[,1])[2]+1,length.out = KnotNumX)
-    Xlist[[KnotNumX-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,1],u=KnotX)
-    AllXlist[[KnotNumX-lower+1]] <- sapply(lowdegree:updegree,BaSplite1,x=AllPost[,1],u=KnotX)
+    Xlist[[KnotNumX-lowerKnot+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,1],u=KnotX,simplify = FALSE)
+    AllXlist[[KnotNumX-lowerKnot+1]] <- sapply(lowdegree:updegree,BaSplite1,x=AllPost[,1],u=KnotX,simplify = FALSE)
   }
 
   Ylist <- list()
   AllYlist <- list()
-  for (KnotNumY in lower:upper){
+  for (KnotNumY in lowerKnot:upperKnot){
     KnotY <- seq(range(Post[,2])[1]-1,range(Post[,2])[2]+1,length.out = KnotNumY)
-    Ylist[[KnotNumY-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,2],u=KnotY)
-    AllYlist[[KnotNumY-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=AllPost[,2],u=KnotY)
+    Ylist[[KnotNumY-lowerKnot+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,2],u=KnotY,simplify = FALSE)
+    AllYlist[[KnotNumY-lowerKnot+1]] <- sapply(lowdegree:updegree, BaSplite1,x=AllPost[,2],u=KnotY,simplify = FALSE)
   }
 
 
@@ -34,10 +34,10 @@ ChoBic1 <- function(lower,upper,Post,Y,AllPost,AllY){
 #   KnotNumX <- 2
 
   Arg <- matrix(c(
-  rep(c(rep(lowdegree:updegree,lenKnot),rep(lower:upper,each=lenDeg)),each=lenDeg*lenKnot),
-  rep(c(rep(lowdegree:updegree,lenKnot),rep(lower:upper,each=lenDeg)),lenDeg*lenKnot)
+  rep(c(rep(lowdegree:updegree,lenKnot),rep(lowerKnot:upperKnot,each=lenDeg)),each=lenDeg*lenKnot),
+  c(rep(rep(lowdegree:updegree,lenKnot),lenDeg*lenKnot),rep(rep(lowerKnot:upperKnot,each=lenDeg),lenDeg*lenKnot))
   ),ncol=4)
-  Argx <- matrix(c(rep(lowdegree:updegree,lenKnot),rep(lower:upper,each=lenDeg)),ncol = 2)
+  Argx <- matrix(c(rep(lowdegree:updegree,lenKnot),rep(lowerKnot:upperKnot,each=lenDeg)),ncol = 2)
 
 
   Bic <- function(DegreeY,KnotNumY){
@@ -45,7 +45,7 @@ ChoBic1 <- function(lower,upper,Post,Y,AllPost,AllY){
     G <- matrix(0,nrow = length(XPost),ncol = KnotNumY+DegreeY-1)
     for (ii in 1:length(XPost)){
       index <- XPost[ii]
-      X <- Ylist[[KnotNumY-lower+1]][[DegreeY-lowdegree+1]][Post[,1]==index,,drop=FALSE]
+      X <- Ylist[[KnotNumY-lowerKnot+1]][[DegreeY-lowdegree+1]][Post[,1]==index,,drop=FALSE]
       # X <- BaSplite1(x = Post[Post[,1]==index,2],degree = DegreeY,u = KnotY)
       if(sum(Post[,1]==index)>KnotNumY+DegreeY+5){
         # AllX <- BaSplite1(x = AllPost[AllPost[,1]==index,2],degree = DegreeY,u = KnotY)
@@ -73,6 +73,7 @@ ChoBic1 <- function(lower,upper,Post,Y,AllPost,AllY){
       AllX <- AllBx[,rep(1:ncol(AllBx),ncol(AllBy))]*AllBy[,rep(1:ncol(AllBy),each=ncol(AllBx))]
       residual <- AllY-AllX%*%matrix(V,ncol = 1)
       return(log(mean(residual^2))+ncol(AllX)*log(nrow(AllX))/nrow(AllX))
+      # return(mean(residual^2))
     }
     return(mapply(BicX,Argx[,1],Argx[,2]))
   }

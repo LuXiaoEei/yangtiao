@@ -17,7 +17,7 @@ SearPoints1 <- function(post,h,lambda=2){
             Max <- mean(orig)+lambda*sd(orig)
             Min <- mean(orig)-lambda*sd(orig)
             new <- Image_noise[Area]
-            Area <- Area[new<Max&new>Min,,drop=FALSE]
+            Area <- Area[new<=Max&new>=Min,,drop=FALSE]
           }
           mark[Area] <<- tag #标记
           searched[post] <<- 1 #加入搜索过矩阵

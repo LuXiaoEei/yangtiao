@@ -4,8 +4,8 @@ ChoBic <- function(lower,upper,Post,Y,AllPost,AllY){
   if(missing(AllY)) AllY <- Y
 
   # 次数
-  updegree <- 3
-  lowdegree <- 1
+  updegree <- 1
+  lowdegree <- 3
   lendegree <- length(lowdegree:updegree)
 
   Bic <- function(Xindex,Yindex){
@@ -21,22 +21,23 @@ ChoBic <- function(lower,upper,Post,Y,AllPost,AllY){
 
     residual <- AllY-AllX %*%(MASS::ginv(t(X)%*%X)%*%t(X)%*%Y)
     return(log(mean(residual^2))+ncol(AllX)*log(nrow(AllX))/nrow(AllX))
+    # return(mean(residual^2))
   }
 
   Xlist <- list()
   AllXlist <- list()
   for (KnotNumX in lower:upper){
     KnotX <- seq(range(Post[,1])[1]-1,range(Post[,1])[2]+1,length.out = KnotNumX)
-    Xlist[[KnotNumX-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,1],u=KnotX)
-    AllXlist[[KnotNumX-lower+1]] <- sapply(lowdegree:updegree,BaSplite1,x=AllPost[,1],u=KnotX)
+    Xlist[[KnotNumX-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,1],u=KnotX,simplify = FALSE)
+    AllXlist[[KnotNumX-lower+1]] <- sapply(lowdegree:updegree,BaSplite1,x=AllPost[,1],u=KnotX,simplify = FALSE)
   }
 
   Ylist <- list()
   AllYlist <- list()
   for (KnotNumY in lower:upper){
     KnotY <- seq(range(Post[,2])[1]-1,range(Post[,2])[2]+1,length.out = KnotNumY)
-    Ylist[[KnotNumY-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,2],u=KnotY)
-    AllYlist[[KnotNumY-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=AllPost[,2],u=KnotY)
+    Ylist[[KnotNumY-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,2],u=KnotY,simplify = FALSE)
+    AllYlist[[KnotNumY-lower+1]] <- sapply(lowdegree:updegree, BaSplite1,x=AllPost[,2],u=KnotY,simplify = FALSE)
   }
 
   len <- upper-lower+1
