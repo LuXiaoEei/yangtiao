@@ -23,8 +23,8 @@ for (k in K){
       alpha <- 0.05
       low <- 2
       uj <- c(1:ROW)
-      u1 <- c(seq(1,5,length.out = 15),seq(6,COL-5,1),seq(COL-4,COL,length.out = 15))#寻找跳点时的候选节点,加大边界寻找密度
-
+      # u1 <- c(seq(1,5,length.out = 15),seq(6,COL-5,1),seq(COL-4,COL,length.out = 15))#寻找跳点时的候选节点,加大边界寻找密度
+      u1 <- seq(1,COL,by = 0.5)
       # 开始拟合 --------------------------------------------------------------------
       # Image_hat <- matrix(0,ROW,COL)
       AllJumps <- matrix(NA,ncol = 2)
@@ -41,16 +41,17 @@ for (k in K){
         sigma2hat<- 1/2*1/(n-1)*sum((yj[-1]-yj[-n])^2)
         Sigma2hat <- c(Sigma2hat,sigma2hat)
 
-        BIC_list<-BIC_knot(low,up,yj,uj,n,alpha,updegree,scale=ROW) # BIC准则选择节点
-        BIC_list<-GCV_knot(low,up,yj,uj,updegree,scale=ROW) # BIC准则选择节点
+        BIC_list<-BIC_knot(low,up,yj,uj,updegree,scale=ROW) # BIC准则选择节点
+        # BIC_list<-GCV_knot(low,up,yj,uj,updegree,scale=ROW) # BIC准则选择节点
 
         u0<-BIC_list[[1]]         ##初始节点
         degree<-BIC_list[[2]]     ##初始次数
         k0<-BIC_list[[3]]      #初始节点数
         err<-BIC_list[[4]]
-        lambda <-BIC_list[[5]]
+        # lambda <-BIC_list[[5]]
+        lambda <- 0
         para <- rbind(para,c(degree,k0,lambda))
-        print(c(degree,k0,lambda))
+        # print(c(degree,k0,lambda))
 
         jumps_find_list <- jumps_find(u0,u1,degree,yj,uj,err,sigma2hat,alpha,gamma = 0)
         u0<-jumps_find_list[[1]]
@@ -138,11 +139,13 @@ for (k in K){
 }
 #
 
+# rm(lambda)
+
 index <- as.numeric(names(sort(table(para[,1]),decreasing = TRUE)[1]))
 lowdegree <- max(index-1,1)
 updegree <- max(index+1,3)
 
-index <- as.numeric(names(sort(table(para[,2]),decreasing = TRUE)[1:2]))
+index <- as.numeric(names(sort(table(para[,2]),decreasing = TRUE)[1]))
 lowerKnot <- max(min(index-1),2)
 upperKnot <- max(index+1,5)
 

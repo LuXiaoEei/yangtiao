@@ -1,7 +1,9 @@
-ChoBic1 <- function(lowerKnot,upperKnot,Post,Y,AllPost,AllY,updegree=3,lowdegree=1){
+ChoBic1 <- function(lowerKnot,upperKnot,Post,Y,AllPost=NULL,AllY=NULL,updegree=3,lowdegree=1){
 
-  if(missing(AllPost)) AllPost <- Post
-  if(missing(AllY)) AllY <- Y
+  # if(missing(AllPost)) AllPost <- Post
+  # if(missing(AllY)) AllY <- Y
+
+  lambda <- 0.0001
 
   # updegree <- 3
   # lowdegree <- 1
@@ -9,29 +11,23 @@ ChoBic1 <- function(lowerKnot,upperKnot,Post,Y,AllPost,AllY,updegree=3,lowdegree
   lenKnot <- length(lowerKnot:upperKnot)
 
   Xlist <- list()
-  AllXlist <- list()
+  # AllXlist <- list()
   for (KnotNumX in lowerKnot:upperKnot){
     KnotX <- seq(range(Post[,1])[1]-1,range(Post[,1])[2]+1,length.out = KnotNumX)
     Xlist[[KnotNumX-lowerKnot+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,1],u=KnotX,simplify = FALSE)
-    AllXlist[[KnotNumX-lowerKnot+1]] <- sapply(lowdegree:updegree,BaSplite1,x=AllPost[,1],u=KnotX,simplify = FALSE)
+    # AllXlist[[KnotNumX-lowerKnot+1]] <- sapply(lowdegree:updegree,BaSplite1,x=AllPost[,1],u=KnotX,simplify = FALSE)
   }
 
   Ylist <- list()
-  AllYlist <- list()
+  # AllYlist <- list()
   for (KnotNumY in lowerKnot:upperKnot){
     KnotY <- seq(range(Post[,2])[1]-1,range(Post[,2])[2]+1,length.out = KnotNumY)
     Ylist[[KnotNumY-lowerKnot+1]] <- sapply(lowdegree:updegree, BaSplite1,x=Post[,2],u=KnotY,simplify = FALSE)
-    AllYlist[[KnotNumY-lowerKnot+1]] <- sapply(lowdegree:updegree, BaSplite1,x=AllPost[,2],u=KnotY,simplify = FALSE)
+    # AllYlist[[KnotNumY-lowerKnot+1]] <- sapply(lowdegree:updegree, BaSplite1,x=AllPost[,2],u=KnotY,simplify = FALSE)
   }
 
 
   #分成两个方向的样条
-
-#
-#   DegreeY <- 1
-#   KnotNumY <- 2
-#   DegreeX <- 1
-#   KnotNumX <- 2
 
   Arg <- matrix(c(
   rep(c(rep(lowdegree:updegree,lenKnot),rep(lowerKnot:upperKnot,each=lenDeg)),each=lenDeg*lenKnot),
@@ -68,11 +64,19 @@ ChoBic1 <- function(lowerKnot,upperKnot,Post,Y,AllPost,AllY,updegree=3,lowdegree
         V[,ii] <- MASS::ginv(t(X)%*%X)%*%t(X)%*%G[,ii]
       }
 
-      AllBx <- BaSplite1(x=AllPost[,1],degree = DegreeX,u = KnotX)
-      AllBy <- BaSplite1(x = AllPost[,2],degree = DegreeY,u = KnotY)
-      AllX <- AllBx[,rep(1:ncol(AllBx),ncol(AllBy))]*AllBy[,rep(1:ncol(AllBy),each=ncol(AllBx))]
-      residual <- AllY-AllX%*%matrix(V,ncol = 1)
-      return(log(mean(residual^2))+ncol(AllX)*log(nrow(AllX))/nrow(AllX))
+      # AllBx <- BaSplite1(x=AllPost[,1],degree = DegreeX,u = KnotX)
+      # AllBy <- BaSplite1(x = AllPost[,2],degree = DegreeY,u = KnotY)
+      # AllX <- AllBx[,rep(1:ncol(AllBx),ncol(AllBy))]*AllBy[,rep(1:ncol(AllBy),each=ncol(AllBx))]
+
+      Bx <- BaSplite1(x=Post[,1],degree = DegreeX,u = KnotX)
+      By <- BaSplite1(x = Post[,2],degree = DegreeY,u = KnotY)
+      X <- Bx[,rep(1:ncol(Bx),ncol(By))]*By[,rep(1:ncol(By),each=ncol(Bx))]
+
+      V <- matrix(V,ncol = 1)
+      residual <- Y-X%*%V
+      # (t(Y)%*%(I-(2-nrow(X)*lambda)*X%*%solve(t(X)%*%X+I1)%*%t(X)+X%*%solve(t(X)%*%X+I1)%*%t(X)%*%X%*%solve(t(X)%*%X+I1)%*%t(X))%*%Y)/length(Y)
+      # return(mean(residual^2)+lambda*sum(V^2))
+      return(log(mean(residual^2))+ncol(X)*log(nrow(X))/nrow(X))
       # return(mean(residual^2))
     }
     return(mapply(BicX,Argx[,1],Argx[,2]))

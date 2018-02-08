@@ -3,8 +3,8 @@ if(FALSE) source('.//demo//BSplineSurface.R')
 require(EBImage)
 require(yangtiao)
 
-rm(list=ls())
-gc()
+# rm(list=ls())
+# gc()
 
 
 if (dir.exists('.//tmp')) unlink('.//tmp', recursive=TRUE)
@@ -26,11 +26,11 @@ f2 <- function(x,y){
 #   z <- 1/2*sign(y>0.6*sin(pi*x)+0.2)+1/2*sign(x>0.6*sin(pi*y)+0.2)
 #   return(z)
 # }
-f2 <- function(x,y){
-  z <- -2*(x-0.5)^2-2*(y-0.5)^2+sign((x-0.5)^2+(y-0.5)^2<0.25^2)
-  return(z)
-}
-
+# f2 <- function(x,y){
+#   z <- -2*(x-0.5)^2-2*(y-0.5)^2+sign((x-0.5)^2+(y-0.5)^2<0.25^2)
+#   return(z)
+# }
+#
 f2 <- function(x,y){
   z <-cos(4*pi*(1-x-y))-2*cos(4*pi*(1-x-y))*sign(x+y-1>0)
   return(z)
@@ -41,6 +41,8 @@ ROW <- 256
 COL <- 256
 
 sigma <- 0.5 #噪声大小
+
+set.seed(1234)
 
 Image_raw <- matrix(f2(x=rep(c(1:ROW),COL)/ROW,y=rep(c(1:COL),each=ROW)/COL),nrow = ROW,ncol = COL)
 # Image_raw <- Image_raw/max(Image_raw)
@@ -55,12 +57,12 @@ startime <- Sys.time()
 
 if(exists('blur')) rm(blur)
 # 寻找跳点中节点和次数的上限设置
-up <- 20
+up <- 15
 updegree <- 5
 
 Smooth <- 2
 K <- c(0)
-if(length(K)>2) blur <- c(1/3,1/3,1/3)
+# if(length(K)>2) blur <- c(1/3,1/3,1/3)
 Count <- 1
 gamma <- 0.15
 source('.//demo//searchjump.R')
@@ -84,7 +86,7 @@ message('######## ','Fit Image',' ########','\n')
 # gc()
 startime <- Sys.time()
 
-denoise <- FALSE
+# denoise <- FALSE
 
 source('.//demo//fit.R')
 print(Sys.time()-startime)

@@ -4,8 +4,8 @@ ChoBic <- function(lower,upper,Post,Y,AllPost,AllY){
   if(missing(AllY)) AllY <- Y
 
   # 次数
-  updegree <- 1
-  lowdegree <- 3
+  # updegree <- 1
+  # lowdegree <- 3
   lendegree <- length(lowdegree:updegree)
 
   Bic <- function(Xindex,Yindex){
