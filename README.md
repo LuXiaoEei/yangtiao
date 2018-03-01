@@ -1,6 +1,6 @@
 yangtiao
 ================
-The package can be used to denoise image by block-B-spline.
+The package can be used to denoise image by block-B-spline(`/demo/BSplineSurface`).
 
 
 Denoise Image:
