@@ -45,6 +45,7 @@ def1 <- function(Jumps,hmax=5,theta=0.95,lambda=3){
 
 if (!exists('hmax')){hmax <- 5}
 if (exists('lambda')){rm(lambda);lambda <- 1000000}
+if (!exists('lambda')){lambda <- 1000000}
 
 def1(Jumps = Jumps,hmax = hmax,theta = 0.95,lambda = lambda) #初始化参数
 

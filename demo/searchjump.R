@@ -21,10 +21,10 @@ for (k in K){
       n <- ROW   ##设置样本量
       # 设置节点选择时的参数
       alpha <- 0.05
-      low <- 2
+      low <- up
       uj <- c(1:ROW)
       # u1 <- c(seq(1,5,length.out = 15),seq(6,COL-5,1),seq(COL-4,COL,length.out = 15))#寻找跳点时的候选节点,加大边界寻找密度
-      u1 <- seq(1,COL,by = 0.5)
+      u1 <- seq(1,COL,by = 1)
       # 开始拟合 --------------------------------------------------------------------
       # Image_hat <- matrix(0,ROW,COL)
       AllJumps <- matrix(NA,ncol = 2)
@@ -49,8 +49,8 @@ for (k in K){
         k0<-BIC_list[[3]]      #初始节点数
         err<-BIC_list[[4]]
         # lambda <-BIC_list[[5]]
-        lambda <- 0
-        para <- rbind(para,c(degree,k0,lambda))
+        # lambda <- 0
+        # para <- rbind(para,c(degree,k0,lambda))
         # print(c(degree,k0,lambda))
 
         jumps_find_list <- jumps_find(u0,u1,degree,yj,uj,err,sigma2hat,alpha,gamma = 0)
@@ -141,15 +141,15 @@ for (k in K){
 
 # rm(lambda)
 
-index <- as.numeric(names(sort(table(para[,1]),decreasing = TRUE)[1]))
-lowdegree <- max(index-1,1)
-updegree <- max(index+1,3)
+# index <- as.numeric(names(sort(table(para[,1]),decreasing = TRUE)[1]))
+lowdegree <- 1
+updegree <- updegree
 
-index <- as.numeric(names(sort(table(para[,2]),decreasing = TRUE)[1]))
-lowerKnot <- max(min(index-1),2)
-upperKnot <- max(index+1,5)
+# index <- as.numeric(names(sort(table(para[,2]),decreasing = TRUE)[1]))
+lowerKnot <- 2
+upperKnot <- up
 
-cat('lowdegree:',lowdegree,'updegree:',updegree,'lowerKnot:',lowerKnot,'upperKnot:',upperKnot,'\n')
+# cat('lowdegree:',lowdegree,'updegree:',updegree,'lowerKnot:',lowerKnot,'upperKnot:',upperKnot,'\n')
 
 
 # 结果可视化

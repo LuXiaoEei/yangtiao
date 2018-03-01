@@ -3,7 +3,7 @@ ChoBic1 <- function(lowerKnot,upperKnot,Post,Y,AllPost=NULL,AllY=NULL,updegree=3
   # if(missing(AllPost)) AllPost <- Post
   # if(missing(AllY)) AllY <- Y
 
-  lambda <- 0.0001
+  # lambda <- 0.0001
 
   # updegree <- 3
   # lowdegree <- 1

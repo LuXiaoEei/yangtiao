@@ -42,7 +42,7 @@ COL <- 256
 
 sigma <- 0.5 #噪声大小
 
-set.seed(1234)
+# set.seed(1234)
 
 Image_raw <- matrix(f2(x=rep(c(1:ROW),COL)/ROW,y=rep(c(1:COL),each=ROW)/COL),nrow = ROW,ncol = COL)
 # Image_raw <- Image_raw/max(Image_raw)
@@ -57,8 +57,8 @@ startime <- Sys.time()
 
 if(exists('blur')) rm(blur)
 # 寻找跳点中节点和次数的上限设置
-up <- 15
-updegree <- 5
+up <- 10
+updegree <- 3
 
 Smooth <- 2
 K <- c(0)
