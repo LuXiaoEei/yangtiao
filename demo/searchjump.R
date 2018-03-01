@@ -275,7 +275,7 @@ for (index in 1:nrow(AllJumps_clear)){
 }
 H <- H[order(H[,2],decreasing = TRUE),]
 
-# 将邻域集合H分为无穷和非无穷，并分开进行插值
+# 将跳点集合H分为无穷和非无穷，并分开进行插值
 Hinf <- H[is.infinite(H[,2]),,drop=FALSE]
 H <- H[H[,2]>Count&!is.infinite(H[,2]),,drop=FALSE]
 

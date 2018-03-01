@@ -36,6 +36,7 @@ system.time(
     #   Post <- which(mark_noise==Mode,arr.ind = TRUE)
     #   Ynoise <- Image_noise[Post]
     # }
+    cat('lowdegree:',lowdegree,'updegree:',updegree,'lowerKnot:',lowerKnot,'upperKnot:',upperKnot,'\n')
     res <- ChoBic1(lowerKnot = lowerKnot,upperKnot = upperKnot,Post = Post,Y = Ynoise,updegree = updegree,lowdegree = lowdegree)
     # res <- ChoBic(lower = lowerKnot,upper = upperKnot,Post = Post,Y = Ynoise,AllPost=AllPost,AllY=AllY)
     print(res)
@@ -49,12 +50,12 @@ system.time(
     DegreeY <- res$DegreeY
 
     # # 节点
-    # KnotNumX <- 20
-    # KnotNumY <- 20
+    # KnotNumX <- 2
+    # KnotNumY <- 2
     #
     # # # 次数
-    # DegreeX <- 5
-    # DegreeY <- 5
+    # DegreeX <- 1
+    # DegreeY <- 1
 
     KnotX <- seq(range(Post[,1])[1]-1,range(Post[,1])[2]+1,length.out = KnotNumX)
     KnotY <- seq(range(Post[,2])[1]-1,range(Post[,2])[2]+1,length.out = KnotNumY)
