@@ -38,7 +38,7 @@ system.time(
     # }
     # cat('lowdegree:',lowdegree,'updegree:',updegree,'lowerKnot:',lowerKnot,'upperKnot:',upperKnot,'\n')
     # res <- ChoBic1(lowerKnot = lowerKnot,upperKnot = upperKnot,Post = Post,Y = Ynoise,updegree = updegree,lowdegree = lowdegree)
-    res <- ChoBic(lowerKnot = lowerKnot,upperKnot = upperKnot,Post = Post,Y = Ynoise,updegree = updegree,lowdegree = lowdegree)
+    res <- ChoBic(lowerKnot = lowerKnot,upperKnot  = upperKnot,Post = Post,Y = Ynoise,updegree = updegree,lowdegree = lowdegree)
     print(res)
 
     # 节点

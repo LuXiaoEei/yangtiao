@@ -45,7 +45,6 @@ def1 <- function(Jumps,hmax=5,theta=0.95,lambda=3){
 
 if (!exists('hmax')){hmax <- 5}
 if (exists('lambda')){rm(lambda);lambda <- 1000000}
-if (!exists('lambda')){lambda <- 1000000}
 
 def1(Jumps = Jumps,hmax = hmax,theta = 0.95,lambda = lambda) #初始化参数
 
@@ -108,7 +107,7 @@ ROW <- nrow(Image_noise)
 COL <- ncol(Image_noise)
 AllJumps <- which(mark==0,arr.ind = TRUE)
 
-JumpValue <- matrix(Image_noise[AllJumps],ncol = ModeNum+1,nrow = nrow(AllJumps))
+JumpValue <- matrix(Image_smooth[AllJumps],ncol = ModeNum+1,nrow = nrow(AllJumps))
 # colnames(JumpValue) <- c('orig',paste0('tag_',1:ModeNum))
 
 for (index in 1:nrow(AllJumps)){
@@ -119,7 +118,7 @@ for (index in 1:nrow(AllJumps)){
     Num <- sum(mark[Area]!=0)
     h <- h+5
   }
-  Values <- cbind(mark[Area],Image_noise[Area])
+  Values <- cbind(mark[Area],Image_smooth[Area])
   JumpValue[index,2:(ModeNum+1)] <- sapply(1:ModeNum,function(x){
   mean(Values[Values[,1]==x,2,drop=FALSE]) #计算邻域内多个模式的点的平均值
   # JumpValue[index,2:(ModeNum+1)] <- sapply(1:ModeNum,function(x){

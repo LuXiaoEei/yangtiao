@@ -31,10 +31,10 @@ f2 <- function(x,y){
 #   return(z)
 # }
 #
-# f2 <- function(x,y){
-#   z <-cos(4*pi*(1-x-y))-2*cos(4*pi*(1-x-y))*sign(x+y-1>0)
-#   return(z)
-# }
+f2 <- function(x,y){
+  z <-cos(4*pi*(1-x-y))-2*cos(4*pi*(1-x-y))*sign(x+y-1>0)
+  return(z)
+}
 
 # 定义图像尺寸
 ROW <- 256
