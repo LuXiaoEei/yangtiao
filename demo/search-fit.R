@@ -7,7 +7,7 @@ if(!exists('updegree')) updegree <- 3
 
 AllJumps3 <- matrix(NA,ncol = 2)[-1,]
 Sigma2hat <- c()
-para <- matrix(NA,0,3) #记录degre和节点个数
+# para <- matrix(NA,0,3) #记录degre和节点个数
 colnames(para) <- c('degree','knotnum','lambda')
 # 跳点寻找
 message('######## ','Detecting...',' ########','\n')
@@ -31,7 +31,6 @@ for (k in K){
       AllJumps <- AllJumps[-1,]
 
       for (index in 1:COL){
-        # print(index)
         # 选择sample
         yj <- Image_noise[,index]
         if(exists('blur')){
@@ -108,7 +107,7 @@ for (k in K){
           sigma2hat<- 1/2*1/(n-1)*sum((yj[-1]-yj[-n])^2)
           Sigma2hat <- c(Sigma2hat,sigma2hat)
 
-          BIC_list<-BIC_knot(low,up,yj,uj,updegree,scale=Num) # BIC准则选择节点
+          BIC_list<-BIC_knot(low,up,yj,uj,n,alpha,updegree,scale=Num) # BIC准则选择节点
           u0<-BIC_list[[1]]         ##初始节点
           degree<-BIC_list[[2]]     ##初始次数
           k0<-BIC_list[[3]]      ##初始节点数
@@ -175,30 +174,12 @@ ClearPoint <- function(hmin=2,count=1){
     y <- Jumpstmp[index,2]
     nearpoint <- matrix(c(rep(c((x-hmin):(x+hmin)),2*hmin+1),rep(c((y-hmin):(y+hmin)),each=2*hmin+1)),ncol = 2)
     clearpoint[index] <- sum(apply(nearpoint,1,
-              function(x){sign(Jumpstmp[,1]==x[1]&Jumpstmp[,2]==x[2])}))
-    }
+                                   function(x){sign(Jumpstmp[,1]==x[1]&Jumpstmp[,2]==x[2])}))
+  }
 
   Jumpstmp <- Jumpstmp[clearpoint>count,]
   return(Jumpstmp)
 }
-# Jumpstmp <- AllJumps
-#
-# # 在hmin大小的邻域内,跳点数量小于等于count的点被认为是杂点
-# for (ii in 1:(2*length(K)+1)){
-#   Jumpstmp <- ClearPoint(hmin = ii,count = ii)
-# }
-#
-# Jumps_clear <- matrix(0,ROW,COL)
-# Jumps_clear[Jumpstmp] <- 1
-# display(Jumps_clear,method = 'r')
-#
-# # 计算跳点的h邻域内跳点的个数，跳点个数小于均值减去2倍标准差的跳点被认为是杂点
-# Freq <- sapply(1:nrow(Jumpstmp),function(x){
-#   return(sum(Jumps_clear[GetArea(Jumpstmp[x,],Row = ROW,Col = COL,h = 4*length(K))]))
-#   })
-# Jumpstmp <- Jumpstmp[Freq>=mean(Freq)-2*sd(Freq),,drop=FALSE]
-#
-# AllJumps_clear <- Jumpstmp
 
 Image_smooth <- matrix(0,ROW,COL)
 for(i in 1:ROW){
@@ -236,185 +217,34 @@ display(Jumps_clear,method = 'r')
 Jumpstmp <- ClearPoint(hmin = 10,count = 2)
 AllJumps_clear <- Jumpstmp
 
-
-
-########################################################################################################################################################
 Jumps <- which(Jumps_clear==1,arr.ind = TRUE)
-####  拟合  ####
+#### 拟合  ###
 message('#### 拟合  ###')
 for( Index in c(FALSE,TRUE)){
   cat(Index,'\n')
-  if (Index) {a <- COL;COL <- ROW;ROW <- a;Image_noise <- t(Image_noise);Jumps <- Jumps[,2:1]}
-  uj <- c(1:ROW)
-  Image_fit <- matrix(0,ROW,COL)
-  for (index in 1:COL){
-    # plot(Image_raw[,index])
-    yj <- Image_noise[,index]
-    jumps <- Jumps[Jumps[,2]==index,1]
-    BIC_list_fit <- BIC_knot_fit(low=lowerKnot,up=upperKnot,yj=yj,uj=uj,updegree=updegree,jumps = jumps,scale=ROW) # BIC准则选择节点和次数
-
-    u0 <- BIC_list_fit[[1]]
-    degree <- BIC_list_fit[[2]]
-    u0[u0==58.5]=58
-
-    # u0<- seq(0,1,length.out = 10)*scale+0.5
-    # if(length(jumps)>0){
-    #   u0 <- setdiff(u0,jumps)
-    #   u0 <- sort(c(u0,rep(jumps,degree+1)))
-    # }
-    # degree <- 3
-
-
-
-    Image_fit[,index] <- fitted(lm(yj ~ BaSplite1(uj,degree,u0)-1))
-    # print(mean((Image_fit[,index]-Image_raw[,index])^2))
-  }
-  if (Index){
-    a <- COL;COL <- ROW;ROW <- a
-    Image_noise <- t(Image_noise)
-    Jumps <- Jumps[,2:1]
-    Image_fit2 <- t(Image_fit)
-  }else{
-    Image_fit1 <- Image_fit
-  }
+    if (Index) {a <- COL;COL <- ROW;ROW <- a;Image_noise <- t(Image_noise);Jumps <- Jumps[,2:1]}
+    uj <- c(1:ROW)
+    Image_fit <- matrix(0,ROW,COL)
+    for (index in 1:COL){
+      # plot(Image_raw[,index])
+      yj <- Image_noise[,index]
+      jumps <- Jumps[Jumps[,2]==index,1]
+      BIC_list_fit <- BIC_knot_fit(low=lowerKnot,up=upperKnot,yj=yj,uj=uj,updegree=updegree,jumps = jumps,scale=ROW) # BIC准则选择节点和次数
+      u0 <- BIC_list_fit[[1]]
+      degree <- BIC_list_fit[[2]]
+      Image_fit[,index] <- fitted(lm(yj ~ BaSplite1(uj,degree,u0)-1))
+    }
+    if (Index){
+      a <- COL;COL <- ROW;ROW <- a
+      Image_noise <- t(Image_noise)
+      Jumps <- Jumps[,2:1]
+      Image_fit2 <- t(Image_fit)
+    }else{
+        Image_fit1 <- Image_fit
+    }
 }
 
 MISE1 <- mean((Image_fit1-Image_raw)^2)
 MISE2 <- mean((Image_fit2-Image_raw)^2)
 MISE3 <- mean(((Image_fit2+Image_fit1)/2-Image_raw)^2)
 print(c(MISE1,MISE2,MISE3))
-
-#######################################################################################################################################################
-
-# 插值
-Jumps_clear <- matrix(0,ROW,COL)
-Jumps_clear[AllJumps_clear] <- 1
-Jumps <- Jumps_clear
-
-Jumps_edge <- Jumps_clear
-
-# for (i in 1:nrow(AllJumps_clear)){
-#   tmp <- GetArea(point = AllJumps_clear[i,],Row = ROW,Col = COL,h = round(min(ROW,COL)*0.02))
-#   tmp <- tmp[tmp[,1]==1|tmp[,1]==ROW|tmp[,2]==1|tmp[,2]==COL,,drop=FALSE]
-#   Jumps_edge[tmp] <- 1
-# }
-#
-
-display(Jumps_clear,method = 'r')
-display(Jumps_edge,method = 'r')
-
-# 寻找最小邻域h，在这邻域内相距最远的两个跳点的距离大于2h,当h超过hmax时候，h当做无穷处理
-Judg <- function(index,h=1,hmax){
-  if(h>hmax){return(Inf)}
-  near <- GetArea(AllJumps_clear[index,],ROW,COL,h)
-  points <- near[Jumps_edge[near]==1,,drop=FALSE]
-  if (nrow(points)==1) return(Judg(index,h=h+1,hmax=hmax))
-  if (max(dist(points))>2*h){
-    return(h)
-  }else{
-    return(Judg(index,h=h+1,hmax=hmax))
-  }
-}
-
-H <- matrix(rep(1,2*nrow(AllJumps_clear)),ncol = 2)
-
-if (!exists('Count')) Count <- 1
-if (!exists('gamma')) gamma <- 0.25
-
-for (index in 1:nrow(AllJumps_clear)){
-  H[index,] <- c(index,Judg(index,h=1,hmax=gamma*min(COL,ROW)))
-}
-H <- H[order(H[,2],decreasing = TRUE),]
-
-# 将跳点集合H分为无穷和非无穷，并分开进行插值
-Hinf <- H[is.infinite(H[,2]),,drop=FALSE]
-H <- H[H[,2]>Count&!is.infinite(H[,2]),,drop=FALSE]
-
-if (nrow(H)>0){
-  for (iii in 1:nrow(H)){
-  index <- H[iii,1]
-  h <- Judg(index,h=1,hmax=gamma*min(COL,ROW))
-  if (h>Count){
-    near <- GetArea(AllJumps_clear[index,],ROW,COL,h)
-    points <- near[Jumps_edge[near]==1,,drop=FALSE]
-    Dist <- as.matrix(dist(points))
-    vertex <- points[which(Dist==max(Dist),arr.ind = TRUE)[,1],,drop=FALSE] #邻域内相距最远的两个点
-    x2 <- AllJumps_clear[index,]
-    for (ii in 1:nrow(vertex)){ #中心点分别和上述两个点之间进行插值
-      x1 <- vertex[ii,]
-      if(abs(x1[1]-x2[1])>=abs(x1[2]-x2[2])){
-        res <- do.call(cbind,approx(x=c(x1[1],x2[1]),y=c(x1[2],x2[2]),xout = x1[1]:x2[1]))
-      }else{
-        res <- do.call(cbind,approx(x=c(x1[2],x2[2]),y=c(x1[1],x2[1]),xout = x1[2]:x2[2]))[,2:1]
-      }
-      Jumps_edge[round(res)] <- 1
-      Jumps[round(res)] <- 1
-    }
-  }
-  }
-}
-
-display(Jumps,method = 'raster')
-
-for (i in 1:nrow(AllJumps_clear)){
-  tmp <- GetArea(point = AllJumps_clear[i,],Row = ROW,Col = COL,h = round(min(ROW,COL)*0.05))
-  tmp <- tmp[tmp[,1]==1|tmp[,1]==ROW|tmp[,2]==1|tmp[,2]==COL,,drop=FALSE]
-  Jumps_edge[tmp] <- 1
-}
-
-# Jumps_edge[c(1,ROW),] <- 1
-# Jumps_edge[,c(1,COL)] <- 1
-if(nrow(Hinf)>0){
-  for (iii in 1:nrow(Hinf)){
-    index <- Hinf[iii,1]
-    h <- Judg(index,h=1,hmax = gamma*min(COL,ROW))
-    if (h>Count&!is.infinite(h)){
-      near <- GetArea(AllJumps_clear[index,],ROW,COL,h)
-      points <- near[Jumps_edge[near]==1,,drop=FALSE]
-      Dist <- as.matrix(dist(points))
-      vertex <- points[which(Dist==max(Dist),arr.ind = TRUE)[,1],,drop=FALSE]
-      x2 <- AllJumps_clear[index,]
-      for (ii in 1:nrow(vertex)){
-        x1 <- vertex[ii,]
-        if(abs(x1[1]-x2[1])>=abs(x1[2]-x2[2])){
-          res <- do.call(cbind,approx(x=c(x1[1],x2[1]),y=c(x1[2],x2[2]),xout = x1[1]:x2[1]))
-        }else{
-          res <- do.call(cbind,approx(x=c(x1[2],x2[2]),y=c(x1[1],x2[1]),xout = x1[2]:x2[2]))[,2:1]
-        }
-        Jumps_edge[round(res)] <- 1
-        Jumps[round(res)] <- 1
-      }
-    }
-  }
-}
-
-display(Jumps,method = 'raster')
-AllJumps_clear <- which(Jumps==1,arr.ind = TRUE)
-
-
-save(AllJumps,Jumps,Image_raw,Image_noise,sigma,AllJumps_clear,lowdegree,updegree,lowerKnot,upperKnot,file = './/tmp//jumps.Rdata')
-
-
-
-# if (clear){
-#   # 补充点
-#   Jumps_clear <- matrix(0,ROW,COL)
-#   Jumps_clear[AllJumps_clear] <- 1
-#   display(Jumps_clear,method = 'raster')
-#
-#   Jumps_clear <- matrix(0,ROW,COL)
-#   for(index in 1:nrow(AllJumps_clear)){
-#     hmax <- 1
-#     nearpoint <- matrix(c(-hmax:hmax,rep(0,4*hmax+2),-hmax:hmax)+rep(AllJumps_clear[index,],each=4*hmax+2),ncol = 2)
-#     # nearpoint <- matrix(c(rep(c((x-hmax):(x+hmax)),2*hmax+1),rep(c((y-hmax):(y+hmax)),each=2*hmax+1)),ncol = 2)
-#     nearpoint <- nearpoint[nearpoint[,1]>=1&nearpoint[,1]<=ROW&nearpoint[,2]<=COL&nearpoint[,2]>=1,,drop=FALSE]
-#     Jumps_clear[nearpoint] <- 1
-#     }
-#
-#   # Jumps_clear <- matrix(0,ROW,COL)
-#   # Jumps_clear[round(AllJumps[clearpoint>1,])] <- 1
-#
-#   display(Jumps_clear,method = 'raster')
-#   Jumps <- Jumps_clear
-# }
-

@@ -20,6 +20,7 @@ ChoBic <- function(lowerKnot,upperKnot,Post,Y,AllPost=NULL,AllY=NULL,updegree,lo
 
     residual <- Y-X %*%(MASS::ginv(t(X)%*%X)%*%t(X)%*%Y)
     return(log(mean(residual^2))+ncol(X)*log(nrow(X))/nrow(X))
+    # return(log(mean(residual^2))+ncol(X)*2.5*log(log(nrow(X)))/nrow(X))
     # return(mean(residual^2))
   }
 

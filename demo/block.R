@@ -45,6 +45,7 @@ def1 <- function(Jumps,hmax=5,theta=0.95,lambda=3){
 
 if (!exists('hmax')){hmax <- 5}
 if (exists('lambda')){rm(lambda);lambda <- 1000000}
+if (!exists('lambda')){lambda <- 1000000}
 
 def1(Jumps = Jumps,hmax = hmax,theta = 0.95,lambda = lambda) #初始化参数
 
@@ -131,6 +132,13 @@ for (index in 1:nrow(AllJumps)){
 JumpValue[is.nan(JumpValue)] <- Inf
 res <- apply(abs(JumpValue[,-1,drop=FALSE]-JumpValue[,1]),1,which.min) #通过相似判断
 # res <- apply(JumpValue[,-1,drop=FALSE],1,which.max) #通过点位置判断，比较光滑
+if (one){
+  if (tag==2){
+    a=table(res)
+    res <- as.integer(names(a[which(a==max(a),arr.ind = TRUE)]))
+  }
+}
+
 
 mark[AllJumps] <- res
 display(mark/max(mark),method = 'raster')

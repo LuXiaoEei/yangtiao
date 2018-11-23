@@ -68,6 +68,7 @@ system.time(
     Coef[is.na(Coef)] <- 0
     # Image_fit[AllPost] <- AllX%*%Coef
     Image_fit[Post] <- X%*%Coef
+    cat('Mode_',Mode,':',mean((Image_fit[Post]-Image_raw[Post])^2),'\n',sep='')
   }
 )
 
